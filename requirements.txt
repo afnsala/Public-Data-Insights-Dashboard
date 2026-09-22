@@ -1,9 +1,3 @@
-"""
-requirements.txt
-
-Required Python packages for the Public Data Insights Dashboard.
-"""
-
 pandas
 streamlit
 plotly
