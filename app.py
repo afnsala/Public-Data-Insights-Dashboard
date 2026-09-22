@@ -125,12 +125,21 @@ st.divider()
 st.subheader("Key Insights")
 st.markdown(
     """
-    *Replace this section with 2-3 written takeaways once you've explored
-    your actual dataset. "translating data into
-    recommendations" piece 
-
-    - **Insight 1:** ...
-    - **Insight 2:** ...
-    - **Insight 3:** ...
+    - **Corn acreage has had its ups and downs, but it's crept higher over
+      time.** In 1983, planting dropped to just 60.2M acres (thanks to
+      a government cutback program), while 1932 saw a whopping 113.0M
+      acres go in the ground. Thinking more generally, farmers have been
+      planting more corn on average each decade. Up from ~76.9M acres in
+      the 1990s to ~93.1M acres in 2021-2025, about a 21% jump.
+    - **Early forecasts are a good guess, but don't bet the farm on them.**
+      Looking at the March forecast vs. the final number each year since
+      2012, USDA's early read is off by about 2% on average. Most years
+      it's pretty close, but 2020 (which was a rough, rainy planting season) missed
+      by nearly 7%, and 2025 was off by about 3.6%. This data is good for a heads-up,
+      but should not be relied upon to make predictions.
+    - **2026 is a bit of a step back from 2025's high.** After peaking at
+      98.8M acres in 2025, planted corn acreage dipped to 96.7M in 2026.
+      Nothing dramatic, just the kind of year-to-year shift you'd expect 
+      as farmers weigh corn against soybeans and other crops.
     """
 )
