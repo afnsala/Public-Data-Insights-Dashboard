@@ -42,6 +42,6 @@ This opens an interactive dashboard in your browser with:
 - A comparison view across categories
 - A written insights panel (you fill in the takeaways once you see the data)
 
-## Step 6: Deploy it 
+## Deploy it 
 
 Push, then deploy at https://share.streamlit.io 
