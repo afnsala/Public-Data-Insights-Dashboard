@@ -94,3 +94,16 @@ def get_summary_stats(value_column: str) -> dict:
     with get_connection() as conn:
         result = pd.read_sql_query(query, conn)
     return result.iloc[0].to_dict()
+
+def get_forecast_vs_final(n_years: int = 10) -> pd.DataFrame:
+    """Final (YEAR) vs. March and June estimates for the most recent complete years."""
+    query = f"""
+        SELECT year, category, value
+        FROM {TABLE_NAME}
+        WHERE category IN ('YEAR', 'YEAR - MAR ACREAGE', 'YEAR - JUN ACREAGE')
+          AND year < (SELECT MAX(year) FROM {TABLE_NAME})
+          AND year >= (SELECT MAX(year) FROM {TABLE_NAME}) - ?
+        ORDER BY year
+    """
+    with get_connection() as conn:
+        return pd.read_sql_query(query, conn, params=[n_years])

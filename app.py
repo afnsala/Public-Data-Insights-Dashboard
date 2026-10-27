@@ -92,18 +92,35 @@ except Exception as e:
 # ---------------------------------------------------------------------------
 # Comparison view
 # ---------------------------------------------------------------------------
-
-# adjust categories so that the top 10 are always shown, even if a filter is applied.
-# make them not stack and rather seperate the bars for better comparison.
-# search up how to seperate bars in plotly express bar chart and implement it.
-
-st.subheader(f"Top {CATEGORY_COLUMN} by {VALUE_COLUMN}")
+st.subheader("Planting Intentions vs. Final Acres (last 10 complete years)")
 try:
-    top_df = queries.get_top_n(CATEGORY_COLUMN, VALUE_COLUMN, n=10)
-    fig2 = px.bar(top_df, x=CATEGORY_COLUMN, y=VALUE_COLUMN)
+    cmp_df = queries.get_forecast_vs_final(10)
+    cmp_df["acres_m"] = cmp_df[VALUE_COLUMN] / 1e6
+    cmp_df[DATE_COLUMN] = cmp_df[DATE_COLUMN].astype(str)  # treat years as labels
+
+    label_map = {"YEAR": "Final", "YEAR - MAR ACREAGE": "March", "YEAR - JUN ACREAGE": "June"}
+    cmp_df["report"] = cmp_df[CATEGORY_COLUMN].map(label_map)
+
+    fig2 = px.bar(
+        cmp_df, x=DATE_COLUMN, y="acres_m", color="report",
+        barmode="group",   # side-by-side instead of stacked
+        category_orders={"report": ["March", "June", "Final"]},
+        labels={"acres_m": "Acres planted (millions)", "report": "Report"},
+    )
     st.plotly_chart(fig2, use_container_width=True)
+
+    # Forecast error: how far off was March vs. what farmers actually planted?
+    pivot = cmp_df.pivot(index=DATE_COLUMN, columns="report", values="acres_m")
+    pivot["march_error_pct"] = (pivot["March"] - pivot["Final"]) / pivot["Final"] * 100
+    err = pivot.reset_index()
+    fig3 = px.bar(
+        err, x=DATE_COLUMN, y="march_error_pct",
+        labels={"march_error_pct": "March estimate error (%)"},
+        title="March estimate vs. final (positive = overestimated)",
+    )
+    st.plotly_chart(fig3, use_container_width=True)
 except Exception as e:
-    st.warning(f"Couldn't build comparison chart \u2014 check column config. ({e})")
+    st.warning(f"Couldn't build comparison chart. ({e})")
 
 # ---------------------------------------------------------------------------
 # Filterable data table
