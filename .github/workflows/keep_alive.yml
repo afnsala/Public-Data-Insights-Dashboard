@@ -2,13 +2,38 @@ name: Keep Streamlit App Alive
 
 on:
   schedule:
-    # Runs every 12 hours (adjust the cron schedule as needed)
-    - cron: '0 */12 * * *'
-  workflow_dispatch: # Allows me to trigger it manually
+    - cron: '0 */8 * * *'   # every 8h, safely inside the 12h window
+  workflow_dispatch:
 
 jobs:
   ping-app:
     runs-on: ubuntu-latest
     steps:
-      - name: Send HTTP Request to Streamlit App
-        run: curl -s -o /dev/null -w "%{http_code}\n" https://public-data-insights-dashboard.streamlit.app/
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Playwright
+        run: |
+          pip install playwright
+          playwright install --with-deps chromium
+
+      - name: Visit the app
+        run: |
+          python - <<'EOF'
+          from playwright.sync_api import sync_playwright
+
+          URL = "https://public-data-insights-dashboard.streamlit.app/"
+          with sync_playwright() as p:
+              browser = p.chromium.launch()
+              page = browser.new_page()
+              page.goto(URL, wait_until="networkidle", timeout=90000)
+              # If the app is asleep, click the wake-up button
+              btn = page.get_by_role("button", name="Yes, get this app back up!")
+              if btn.count() > 0:
+                  btn.click()
+                  page.wait_for_timeout(30000)
+              page.wait_for_timeout(5000)
+              print("Title:", page.title())
+              browser.close()
+          EOF
